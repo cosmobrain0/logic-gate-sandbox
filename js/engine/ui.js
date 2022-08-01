@@ -5,7 +5,7 @@ const UI_RENDERERS = {};
 	class RectangleCollider {
 		/**
 		 * 
-		 * @param {Button} parent 
+		 * @param {Button|Menu} parent 
 		 * @param {Number} width 
 		 * @param {Number} height 
 		 */
@@ -28,7 +28,7 @@ const UI_RENDERERS = {};
 	class CircleCollider {
 		/**
 		 * 
-		 * @param {Button} parent 
+		 * @param {Button|Menu} parent 
 		 * @param {Number} radius 
 		 */
 		constructor(parent, radius) {
@@ -49,7 +49,7 @@ const UI_RENDERERS = {};
 	class RectangleRenderer {
 		/**
 		 * 
-		 * @param {Button} parent 
+		 * @param {Button|Menu} parent 
 		 * @param {Number} width 
 		 * @param {Number} height 
 		 * @param {String} bgcolour 
@@ -68,25 +68,29 @@ const UI_RENDERERS = {};
 			this.font = font;
 		}
 	
-		render() {
+		/**
+		 * 
+		 * @param {CanvasRenderingContext2D} ctx 
+		 */
+		render(ctx) {
 			let position = this.parent.globalPosition;
-			Canvas.ctx.fillStyle = this.bgcolour;
-			Canvas.ctx.fillRect(position.x, position.y, this.width, this.height);
+			ctx.fillStyle = this.bgcolour;
+			ctx.fillRect(position.x, position.y, this.width, this.height);
 			if (this.parent.hover) {
-				Canvas.ctx.fillStyle = this.hoverbg;
-				Canvas.ctx.fillRect(position.x, position.y, this.width, this.height);
+				ctx.fillStyle = this.hoverbg;
+				ctx.fillRect(position.x, position.y, this.width, this.height);
 			}
-			Canvas.ctx.fillStyle = this.txtcolour;
-			Canvas.ctx.font = this.font;
-			let textDetails = Canvas.ctx.measureText(this.text);
-			Canvas.ctx.fillText(this.text, position.x-textDetails.width/2 + this.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2 + this.height/2);
+			ctx.fillStyle = this.txtcolour;
+			ctx.font = this.font;
+			let textDetails = ctx.measureText(this.text);
+			ctx.fillText(this.text, position.x-textDetails.width/2 + this.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2 + this.height/2);
 		}
 	}
 	
 	class CircleRenderer {
 		/**
 		 * 
-		 * @param {Button} parent 
+		 * @param {Button|Menu} parent 
 		 * @param {Number} radius 
 		 * @param {String} bgcolour 
 		 * @param {String} hoverbg
@@ -104,22 +108,26 @@ const UI_RENDERERS = {};
 			this.font = font;
 		}
 	
-		render() {
+		/**
+		 * 
+		 * @param {CanvasRenderingContext2D} ctx 
+		 */
+		render(ctx) {
 			let position = this.parent.globalPosition;
-			Canvas.ctx.fillStyle = this.bgcolour;
-			Canvas.ctx.beginPath();
-			Canvas.ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
-			Canvas.ctx.fill();
+			ctx.fillStyle = this.bgcolour;
+			ctx.beginPath();
+			ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
+			ctx.fill();
 			if (this.parent.hover) {
-				Canvas.ctx.fillStyle= this.hoverbg;
-				Canvas.ctx.beginPath();
-				Canvas.ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
-				Canvas.ctx.fill();
+				ctx.fillStyle= this.hoverbg;
+				ctx.beginPath();
+				ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
+				ctx.fill();
 			}
-			Canvas.ctx.fillStyle = this.txtcolour;
-			Canvas.ctx.font = this.font;
-			let textDetails = Canvas.ctx.measureText(this.text);
-			Canvas.ctx.fillText(this.text, position.x-textDetails.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2);
+			ctx.fillStyle = this.txtcolour;
+			ctx.font = this.font;
+			let textDetails = ctx.measureText(this.text);
+			ctx.fillText(this.text, position.x-textDetails.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2);
 		}
 	}
 
@@ -180,7 +188,7 @@ class Menu {
 	 * @param {Vector} position 
 	 * @param {Menu?} parent 
 	 */
-	constructor(position, parent) {
+	constructor(position, parent, size) {
 		this.position = position.copy();
 		// NOTE: add dragging stuff to menu, not button
 		this.parent = parent; // Menu or null
@@ -193,6 +201,8 @@ class Menu {
 		 * @type {Menu[]}
 		 */
 		this.menus = [];
+		this.size = size instanceof Vector ? size.copy() : new Vector(0, 0);
+		this.collider = new UI_COLLIDERS.RectangleCollider(this, this.size.x, this.size.y);
 	}
 
 	get hover() {

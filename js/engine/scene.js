@@ -33,7 +33,7 @@ class Scene {
         this.calc = options.calc == null ? Scene.defaultCalc : options.calc;
         this.draw = options.draw == null ? Scene.defaultDraw : options.draw;
         this.data = data == null ? {} : data;
-        this.UI = new Menu(new Vector(0, 0), null);
+        this.UI = new Menu(new Vector(0, 0), null, new Vector(Canvas.width, Canvas.height));
         this.requiresInit = true;
         this.requiresRestart = false;
         this.labels = labels.slice();
@@ -49,7 +49,7 @@ class Scene {
     static defaultPause() { /* do nothing */ }
     static defaultEnd() { /* do nothing */ }
     static defaultCalc() { /* do nothing */ }
-    static defaultDraw() { this.UI.draw(); }
+    static defaultDraw(scene, ctx) { this.UI.draw(ctx); }
 
     /**
      * 

@@ -52,7 +52,7 @@ const Input = {
 	},
 	keymap: {}
 }
-const UI = new Menu(new Vector(0, 0), null);
+const UI = new Menu(new Vector(0, 0), null, new Vector(Canvas.width, Canvas.height));
 const Time = {
 	previousFrameTime: null,
 	currentFrameTime: null,
@@ -111,7 +111,7 @@ const main = (t) => {
     Canvas.ctx.clearRect(0, 0, Canvas.c.width, Canvas.c.height);
     Utility.adjustSize(Canvas.c, Canvas.ctx);
 	if (!Scene.currentTransition && Scene.currentScene) Scene.currentScene.draw(Scene.currentScene, Canvas.ctx);
-	UI.draw();
+	UI.draw(Canvas.ctx);
 	if (Scene.currentTransition) {
 		Utility.adjustSize(Scene.currentTransition.startCanvas, Scene.currentTransition.startContext);
 		Utility.adjustSize(Scene.currentTransition.endCanvas, Scene.currentTransition.endContext);

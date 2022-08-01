@@ -177,8 +177,8 @@ class Button {
 		}
 	}
 
-	draw() {
-		this.renderer.render();
+	draw(ctx) {
+		this.renderer.render(ctx);
 	}
 }
 
@@ -238,13 +238,17 @@ class Menu {
 		for (let menu of this.menus) menu.update();
 	}
 
-	draw() {
+	/**
+	 * 
+	 * @param {CanvasRenderingContext2D} ctx 
+	 */
+	draw(ctx) {
 		// this.renderer.render();
 		for (let menu of this.menus) {
-			menu.draw();
+			menu.draw(ctx);
 		}
 		for (let button of this.buttons) {
-			button.draw();
+			button.draw(ctx);
 		}
 	}
 }

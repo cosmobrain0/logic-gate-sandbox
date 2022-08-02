@@ -13,6 +13,25 @@ const Events = {
 	touchcancel: [],
 	touchend   : [],
 }
+
+/**
+ * 
+ * @param {Vector} position the position of the cursour which might be hovering over a button
+ * @param {Menu} menu the root menu t osearch for buttons
+ */
+const findHoveredButton = (position, menu) => {
+	for (let button of menu.buttons) {
+		if (button.collider.intersects(position)) {
+			return button;
+		}
+	}
+	for (let m of menu.menus) {
+		let button = findHoveredButton(m);
+		if (button) return button;
+	}
+	return null;
+}
+
 onmousemove = e => {
 	Input.mouse.position = Utility.adjustMousePosition(e.clientX, e.clientY);
 	if (Input.mouse.leftclick.down) Input.mouse.leftclick.path.push(Input.mouse.position.copy());
@@ -24,20 +43,25 @@ onmousedown = e => {
 		Input.mouse.leftclick.down = true;
 		Input.mouse.leftclick.start = Input.mouse.position.copy();
 		Input.mouse.leftclick.path = [Input.mouse.position.copy()];
-		Input.mouse.selected = null;
-		
+		let hover = findHoveredButton(Input.mouse.position.copy(), UI);
+		if (!hover && Scene.currentScene) hover = findHoveredButton(Input.mouse.position.copy(), Scene.currentScene.UI);
+		Input.mouse.leftclick.selected = hover;
 	}
     else if (e.button == 2) {
 		Input.mouse.rightclick.down = true;
 		Input.mouse.rightclick.start = Input.mouse.position.copy();
 		Input.mouse.rightclick.path = [Input.mouse.position.copy()];
+		let hover = findHoveredButton(Input.mouse.position.copy(), UI);
+		if (!hover && Scene.currentScene) hover = findHoveredButton(Input.mouse.position.copy(), Scene.currentScene.UI);
+		Input.mouse.rightclick.selected = hover;
 	}
 	for (let f of Events.mousedown) f(e);
 }
 onmouseup = e => {
     if (e.button == 0) {
 		Input.mouse.leftclick.down = false;
-		UI.update();
+		UI.update(Input.mouse.leftclick.start, Input.mouse.leftclick.down);
+		if (Scene.currentScene) Scene.currentScene.UI.update(Input.mouse.leftclick.start, Input.mouse.leftclick.down);
 	}
     else if (e.button == 2) Input.mouse.rightclick.down = false;
 	for (let f of Events.mouseup) f(e);

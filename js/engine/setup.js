@@ -31,6 +31,7 @@ class MouseButton {
 		this.start = start.copy();
 		this.path = [];
 		this.identifier = identifier;
+		this.selected = null;
 	}
 
 	drag() {
@@ -47,7 +48,6 @@ const Input = {
 		position: new Vector(0, 0),
 		leftclick: new MouseButton(new Vector(0, 0), false),
 		rightclick: new MouseButton(new Vector(0, 0), false),
-		selected: null,
 		touches: []
 	},
 	keymap: {}
@@ -122,7 +122,9 @@ const main = (t) => {
 			// Scene.transitionFrom.pause(Scene.transitionFrom);
 			// Scene.transitionFrom.end(Scene.transitionFrom);
 			// Scene.currentScene = Scene.trans
-			Scene.immediateLoad(Scene.transitioningTo);
+			// Scene.immediateLoad(Scene.transitioningTo);
+			Scene.unload(Scene.transitionFrom);
+			Scene.currentScene = Scene.transitioningTo;
 		}
 	}
     requestAnimationFrame(main);

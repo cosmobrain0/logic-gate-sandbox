@@ -160,11 +160,17 @@ class Button {
 		this.callbacks = callbacks;
 		this.position = position.copy();
 		this.parent = parent; // a menu
+		this.hover = false;
 		if (this.parent) this.parent.addButton(this);
 	}
 
-	get hover() {
-		return this.collider.intersects(Input.mouse.position);
+	/**
+	 * 
+	 * @param {Vector} mouse the position of the cursor
+	 * @returns {boolean} wether or not the mouse is hovering over the button
+	 */
+	isHovering(mouse) {
+		return this.collider.intersects(mouse);
 	}
 
 	get globalPosition() {
@@ -203,9 +209,15 @@ class Menu {
 		this.menus = [];
 		this.size = size instanceof Vector ? size.copy() : new Vector(0, 0);
 		this.collider = new UI_COLLIDERS.RectangleCollider(this, this.size.x, this.size.y);
+		this.hover = false;
 	}
 
-	get hover() {
+	/**
+	 * 
+	 * @param {Vector} mouse the position of the cursor
+	 * @returns {boolean} wether or not the mouse is hovering above this menu
+	 */
+	isHovering(mouse) {
 		return this.collider.intersects(Input.mouse.position);
 	}
 
@@ -231,11 +243,13 @@ class Menu {
 		menu.parent = this;
 	}
 
-	update() {
+	update(mouse, mousedown) {
+		this.hover = this.isHovering(mouse);
 		for (let button of this.buttons) {
-			if (button.hover) button.click();
+			button.hover = button.isHovering(mouse);
+			if (button.hover && mousedown) button.click();
 		}
-		for (let menu of this.menus) menu.update();
+		for (let menu of this.menus) menu.update(mouse, mousedown);
 	}
 
 	/**

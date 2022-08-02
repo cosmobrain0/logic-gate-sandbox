@@ -19,9 +19,13 @@ const Utility = {
      * @returns {Vector} the position of the mouse on canvas
      */
     adjustMousePosition: (x, y) => {
-        let position = new Vector(x - (window.innerWidth - Canvas.c.width) / 2, y - (window.innerHeight - Canvas.c.height) / 2);
-        position.x /= Canvas.c.width / Canvas.width;
-        position.y /= Canvas.c.height / Canvas.height;
+        let screenPixelWidth = Canvas.c.style.width;
+        screenPixelWidth = parseInt(screenPixelWidth.slice(0, screenPixelWidth.length-2));
+        let screenPixelHeight = Canvas.c.style.height;
+        screenPixelHeight = parseInt(screenPixelHeight.slice(0, screenPixelHeight.length-2));
+        let position = new Vector(x - (window.innerWidth - screenPixelWidth) / 2, y - (window.innerHeight - screenPixelHeight) / 2);
+        position.x /= screenPixelWidth / Canvas.width;
+        position.y /= screenPixelHeight / Canvas.height;
         // position.calculatePolar();
         return position;
     },

@@ -52,7 +52,7 @@ class Scene {
     static defaultDraw(scene, ctx) { this.UI.draw(ctx); }
 
     /**
-     * 
+     * Use this to load a scene. Handles transitions and unloading the current scene
      * @param {Scene} scene 
      */
     static load(scene) {
@@ -76,14 +76,7 @@ class Scene {
             scene.transitioningIn = true;
             Scene.currentTransition = transition.toTransition();
 
-            if (scene.requiresInit) {
-                scene.requiresInit = false;
-                scene.init(scene);
-            }
-            if (scene.requiresRestart) {
-                scene.requiresRestart = false;
-                scene.restart(scene);
-            }
+            Scene.loadIn(scene);
         }
     }
 
@@ -101,18 +94,35 @@ class Scene {
             Scene.transitioningTo = null;
         }
         Scene.currentTransition = null;
-        if (Scene.currentScene) {
+        if (Scene.currentScene) Scene.unload(Scene.currentScene);
+        Scene.currentScene = scene;
+        Scene.loadIn(scene);
+    }
+
+    /**
+     * 
+     * @param {Scene} scene 
+     */
+    static unload(scene) {
+        if (Scene.currentScene == scene) {
             Scene.currentScene.pause(Scene.currentScene);
             Scene.currentScene.end(Scene.currentScene);
         }
-        Scene.currentScene = scene;
-        if (Scene.currentScene.requiresInit) {
-            Scene.currentScene.requiresInit = false;
-            Scene.currentScene.init(Scene.currentScene);
+        Scene.currentScene = null;
+    }
+
+    /**
+     * just loads the scene. Inteded for internal use
+     * @param {Scene} scene 
+     */
+    static loadIn(scene) {
+        if (scene.requiresInit) {
+            scene.requiresInit = false;
+            scene.init(scene);
         }
-        if (Scene.currentScene.requiresRestart) {
-            Scene.currentScene.requiresRestart = false;
-            Scene.currentScene.restart(Scene.currentScene);
+        if (scene.requiresRestart) {
+            scene.requiresRestart = false;
+            scene.restart(scene);
         }
     }
 

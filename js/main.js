@@ -9,6 +9,8 @@ scenes.push(
             UI.addButton(RectangleButton(UI, 400, 450, 200, 100, "#555", "#fff8", "potato", "#fff", "30px Arial", [
                 () => console.log("clicked"),
             ]));
+            data.fpsCount = RectangleButton(UI, 100, 100, 0, 0, "#0000", "#0000", "", "#fff", "40px Arial", []);
+            UI.addButton(data.fpsCount);
             data.mouseup = e => {
                 console.log(Input.mouse);
                 if (Input.mouse.leftclick.selected) {
@@ -25,6 +27,7 @@ scenes.push(
          */
         calc: ({data, UI}) => {
             UI.update(Input.mouse.position, Input.mouse.leftclick.down);
+            data.fpsCount.renderer.text = `${floor(1000/Time.deltaTime)}`;
         },
         /**
          * 

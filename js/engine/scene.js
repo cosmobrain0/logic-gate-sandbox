@@ -168,6 +168,7 @@ class SceneTransition {
         this.startContext = this.startCanvas.getContext('2d');
         this.endContext = this.endCanvas.getContext('2d');
         this.handler = handler;
+        this.data = {};
     }
 
     // get time() { return Time.currentFrameTime - this.timeOfStart; }

@@ -186,6 +186,62 @@ class Button {
 	draw(ctx) {
 		this.renderer.render(ctx);
 	}
+
+	destroy() {
+		this.parent.removeButton(this);
+	}
+}
+
+class TextInput {
+	/**
+	 * 
+	 * @param {Menu?} parent 
+	 * @param {Vector} position the local position of this input on the menu
+	 * @param {Collider} collider a rectangle collider
+	 * @param {Function[]} callbacks the functions to be called when this input's value changes
+	 */
+	constructor(parent, position, collider, callbacks) {
+		this.parent = parent;
+		this.position = position.copy();
+		this.collider = collider;
+		this.collider.parent = this;
+		this.callbacks = callbacks.slice();
+		let input = document.createElement('textarea');
+		input.classList.add('input-text');
+		input.oninput = () => {
+			for (let callback of this.callbacks) callback.bind(this, this)();
+		}
+		document.body.appendChild(input);
+		this.input = input;
+		this.update();
+		this.parent.addTextInput(this);
+	}
+
+	get value() { return this.input.value; }
+	get globalPosition() { return this.parent == null ? this.position.copy() : Vector.add(this.parent.globalPosition, this.position); }
+
+	/**
+	 * 
+	 * @param {Vector} mouse the position of the cursour
+	 * @returns {boolean} wether or not the mouse is hovering over the input box
+	 */
+	isHovering(mouse) {
+		return this.collider.intersects(mouse);
+	}
+
+	update() {
+		let topLeft = Utility.worldToScreenPosition(this.position.x, this.position.y);
+		let size = Utility.worldToScreenOffset(this.collider.size.x, this.collider.size.y);
+		this.input.style.left = `${floor(topLeft.x)}px`;
+		this.input.style.top = `${floor(topLeft.y)}px`;
+		this.input.style.width = `${floor(size.x)}px`;
+		this.input.style.height = `${floor(size.y)}px`;
+	}
+
+	destroy() {
+		document.body.removeChild(this.input);
+		this.parent.removeTextInput(this);
+	}
 }
 
 class Menu {
@@ -204,6 +260,10 @@ class Menu {
 		 */
 		this.buttons = [];
 		/**
+		 * @type {TextInput}
+		 */
+		this.textInputs = [];
+		/**
 		 * @type {Menu[]}
 		 */
 		this.menus = [];
@@ -218,7 +278,7 @@ class Menu {
 	 * @returns {boolean} wether or not the mouse is hovering above this menu
 	 */
 	isHovering(mouse) {
-		return this.collider.intersects(Input.mouse.position);
+		return this.collider.intersects(mouse);
 	}
 
 	get globalPosition() {
@@ -232,6 +292,29 @@ class Menu {
 	addButton(btn) {
 		if (!this.buttons.includes(btn)) this.buttons.push(btn);
 		btn.parent = this;
+	}
+
+	removeButton(btn) {
+		if (this.buttons.includes(btn)) this.buttons.splice(this.buttons.indexOf(btn), 1);
+	}
+
+	/**
+	 * 
+	 * @param {TextInput} input the input to add
+	 */
+	addTextInput(input) {
+		if (!this.textInputs.includes(input)) this.textInputs.push(input);
+		input.parent = this;
+	}
+
+	/**
+	 * 
+	 * @param {TextInput} input the input to remove
+	 */
+	removeTextInput(input) {
+		if (this.textInputs.includes(input)) this.textInputs.splice(this.textInputs.indexOf(input), 1);
+		input.parent = null;
+		if (input.input && document.body.contains(input.input)) document.body.removeChild(input.input);
 	}
 
 	/**
@@ -249,6 +332,7 @@ class Menu {
 			button.hover = button.isHovering(mouse);
 			if (button.hover && mousedown) button.click();
 		}
+		for (let input of this.textInputs) input.update();
 		for (let menu of this.menus) menu.update(mouse, mousedown);
 	}
 

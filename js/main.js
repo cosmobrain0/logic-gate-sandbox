@@ -12,11 +12,18 @@ scenes.push(
             data.fpsCount = RectangleButton(UI, 100, 100, 0, 0, "#0000", "#0000", "", "#fff", "40px Arial", []);
             UI.addButton(data.fpsCount);
             data.mouseup = e => {
-                console.log(Input.mouse);
+                // console.log(Input.mouse);
                 if (Input.mouse.leftclick.selected) {
                     console.log("UI interaction");
                 } else {
-                    console.log("game interaction");
+                    const { worldToScreenPosition, worldToScreenOffset } = Utility;
+                    // console.log("game interaction");
+                    // let topLeft = worldToScreenPosition(Input.mouse.leftclick.start.x, Input.mouse.leftclick.start.y);
+                    // let size = worldToScreenOffset(Input.mouse.leftclick.drag().x, Input.mouse.leftclick.drag().y);
+                    if (data.input && data.input.input) data.input.destroy();
+                    data.input = new TextInput(UI, Input.mouse.leftclick.start.copy(), new UI_COLLIDERS.RectangleCollider(null, Input.mouse.leftclick.drag().x, Input.mouse.leftclick.drag().y), [
+                        input => UI.buttons[0].renderer.text = input.input.value,
+                    ]);
                 }
             }
             Events.mouseup.push(data.mouseup);

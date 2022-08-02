@@ -35,8 +35,8 @@ class MouseButton {
 	}
 
 	drag() {
-		if (this.path.length) return this.path[this.path.length-1].to(this.start).length();
-		return 0;
+		if (this.path.length) return this.start.to(this.path[this.path.length-1]);
+		return new Vector();
 	}
 }
 /**

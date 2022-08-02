@@ -20,8 +20,11 @@ const Events = {
  * @param {Menu} menu the root menu t osearch for buttons
  */
 const findHoveredButton = (position, menu) => {
+	for (let textInput of menu.textInputs) {
+		if (textInput.isHovering(position)) return textInput;
+	}
 	for (let button of menu.buttons) {
-		if (button.collider.intersects(position)) {
+		if (button.isHovering(position)) {
 			return button;
 		}
 	}

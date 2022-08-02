@@ -26,7 +26,43 @@ const Utility = {
         let position = new Vector(x - (window.innerWidth - screenPixelWidth) / 2, y - (window.innerHeight - screenPixelHeight) / 2);
         position.x /= screenPixelWidth / Canvas.width;
         position.y /= screenPixelHeight / Canvas.height;
-        // position.calculatePolar();
+        return position;
+    },
+
+    /**
+     * converts world-space coordinates to webpage-space coordinates
+     * @param {Number} x world-space coordinates
+     * @param {Number} y world-space coordinates
+     * @returns {Vector} the screen-space coordinates
+     */
+    worldToScreenPosition: (x, y) => {
+        let screenPixelWidth = Canvas.c.style.width;
+        screenPixelWidth = parseInt(screenPixelWidth.slice(0, screenPixelWidth.length-2));
+        let screenPixelHeight = Canvas.c.style.height;
+        screenPixelHeight = parseInt(screenPixelHeight.slice(0, screenPixelHeight.length-2));
+
+        let position = new Vector(x, y);
+        position.x *= screenPixelWidth/Canvas.width;
+        position.y *= screenPixelHeight/Canvas.height;
+        position.x += (window.innerWidth - screenPixelWidth)/2;
+        position.y += (window.innerHeight-screenPixelHeight)/2;
+        return position;
+    },
+
+    /**
+     * 
+     * @param {Number} dx the world-space offset in the x direction
+     * @param {Number} dy the world-space offste in the y direction
+     */
+    worldToScreenOffset: (dx, dy) => {
+        let screenPixelWidth = Canvas.c.style.width;
+        screenPixelWidth = parseInt(screenPixelWidth.slice(0, screenPixelWidth.length-2));
+        let screenPixelHeight = Canvas.c.style.height;
+        screenPixelHeight = parseInt(screenPixelHeight.slice(0, screenPixelHeight.length-2));
+        
+        let position = new Vector(dx, dy);
+        position.x *= screenPixelWidth/Canvas.width;
+        position.y *= screenPixelHeight/Canvas.height;
         return position;
     },
 

@@ -3,6 +3,8 @@
  * @property {string} name the name of this bit
  * @property {Vector} position the global position of the bit on the board
  * @property {boolean} value the value of this bit
+ * @property {boolean} canGetInput wether or not a connection can decide this bit's value
+ * @property {boolean} canGiveOutput wether or not a connection can be made from this bit to another
  */
 
 /**

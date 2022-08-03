@@ -1,8 +1,9 @@
 implement Bit
+implement BasicNandGate
+implement Connection
 
 [done]
 
-implement BasicNandGate
 implement CustomGate
 create a CustomGate out of a BasicNandGate
 create a Board

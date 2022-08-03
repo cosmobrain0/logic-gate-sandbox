@@ -1,145 +1,134 @@
-const UI_COLLIDERS = {};
-const UI_RENDERERS = {};
+class RectangleCollider {
+	/**
+	 * 
+	 * @param {Button|Menu} parent 
+	 * @param {Number} width 
+	 * @param {Number} height 
+	 */
+	constructor(parent, width, height) {
+		this.parent = parent;
+		this.size = new Vector(width, height);
+	}
 
-(() => {
-	class RectangleCollider {
-		/**
-		 * 
-		 * @param {Button|Menu} parent 
-		 * @param {Number} width 
-		 * @param {Number} height 
-		 */
-		constructor(parent, width, height) {
-			this.parent = parent;
-			this.size = new Vector(width, height);
-		}
-	
-		/**
-		 * 
-		 * @param {Vector} position the point to test
-		 * @returns {boolean} if the point is over this collider
-		 */
-		intersects(position) {
-			let pos = this.parent.globalPosition;
-			return Utility.inRange(position.x, pos.x, pos.x+this.size.x) && Utility.inRange(position.y, pos.y, pos.y+this.size.y);
-		}
+	/**
+	 * 
+	 * @param {Vector} position the point to test
+	 * @returns {boolean} if the point is over this collider
+	 */
+	intersects(position) {
+		let pos = this.parent.globalPosition;
+		return Utility.inRange(position.x, pos.x, pos.x+this.size.x) && Utility.inRange(position.y, pos.y, pos.y+this.size.y);
 	}
-	
-	class CircleCollider {
-		/**
-		 * 
-		 * @param {Button|Menu} parent 
-		 * @param {Number} radius 
-		 */
-		constructor(parent, radius) {
-			this.parent = parent;
-			this.radius = radius;
-		}
-	
-		/**
-		 * 
-		 * @param {Vector} position the point to test
-		 * @returns {boolean} if the point is over this collider
-		 */
-		intersects(position) {
-			return position.to(this.parent.globalPosition).sqrLength() < this.radius*this.radius;
-		}
+}
+
+class CircleCollider {
+	/**
+	 * 
+	 * @param {Button|Menu} parent 
+	 * @param {Number} radius 
+	 */
+	constructor(parent, radius) {
+		this.parent = parent;
+		this.radius = radius;
 	}
-	
-	class RectangleRenderer {
-		/**
-		 * 
-		 * @param {Button|Menu} parent 
-		 * @param {Number} width 
-		 * @param {Number} height 
-		 * @param {String} bgcolour 
-		 * @param {String} text 
-		 * @param {String} txtcolour 
-		 * @param {String} font 
-		 */
-		constructor(parent, width, height, bgcolour, hoverbg, text, txtcolour, font) {
-			this.parent = parent;
-			this.width = width;
-			this.height = height;
-			this.bgcolour = bgcolour;
-			this.hoverbg = hoverbg;
-			this.text = text;
-			this.txtcolour = txtcolour;
-			this.font = font;
-		}
-	
-		/**
-		 * 
-		 * @param {CanvasRenderingContext2D} ctx 
-		 */
-		render(ctx) {
-			let position = this.parent.globalPosition;
-			ctx.fillStyle = this.bgcolour;
+
+	/**
+	 * 
+	 * @param {Vector} position the point to test
+	 * @returns {boolean} if the point is over this collider
+	 */
+	intersects(position) {
+		return position.to(this.parent.globalPosition).sqrLength() < this.radius*this.radius;
+	}
+}
+
+class RectangleRenderer {
+	/**
+	 * 
+	 * @param {Button|Menu} parent 
+	 * @param {Number} width 
+	 * @param {Number} height 
+	 * @param {String} bgcolour 
+	 * @param {String} text 
+	 * @param {String} txtcolour 
+	 * @param {String} font 
+	 */
+	constructor(parent, width, height, bgcolour, hoverbg, text, txtcolour, font) {
+		this.parent = parent;
+		this.width = width;
+		this.height = height;
+		this.bgcolour = bgcolour;
+		this.hoverbg = hoverbg;
+		this.text = text;
+		this.txtcolour = txtcolour;
+		this.font = font;
+	}
+
+	/**
+	 * 
+	 * @param {CanvasRenderingContext2D} ctx 
+	 */
+	render(ctx) {
+		let position = this.parent.globalPosition;
+		ctx.fillStyle = this.bgcolour;
+		ctx.fillRect(position.x, position.y, this.width, this.height);
+		if (this.parent.hover) {
+			ctx.fillStyle = this.hoverbg;
 			ctx.fillRect(position.x, position.y, this.width, this.height);
-			if (this.parent.hover) {
-				ctx.fillStyle = this.hoverbg;
-				ctx.fillRect(position.x, position.y, this.width, this.height);
-			}
-			ctx.fillStyle = this.txtcolour;
-			ctx.font = this.font;
-			let textDetails = ctx.measureText(this.text);
-			ctx.fillText(this.text, position.x-textDetails.width/2 + this.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2 + this.height/2);
 		}
+		ctx.fillStyle = this.txtcolour;
+		ctx.font = this.font;
+		let textDetails = ctx.measureText(this.text);
+		ctx.fillText(this.text, position.x-textDetails.width/2 + this.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2 + this.height/2);
 	}
-	
-	class CircleRenderer {
-		/**
-		 * 
-		 * @param {Button|Menu} parent 
-		 * @param {Number} radius 
-		 * @param {String} bgcolour 
-		 * @param {String} hoverbg
-		 * @param {String} text 
-		 * @param {String} txtcolour 
-		 * @param {String} font 
-		 */
-		constructor(parent, radius, bgcolour, hoverbg, text, txtcolour, font) {
-			this.parent = parent;
-			this.radius = radius;
-			this.bgcolour = bgcolour;
-			this.hoverbg = hoverbg;
-			this.text = text;
-			this.txtcolour = txtcolour;
-			this.font = font;
-		}
-	
-		/**
-		 * 
-		 * @param {CanvasRenderingContext2D} ctx 
-		 */
-		render(ctx) {
-			let position = this.parent.globalPosition;
-			ctx.fillStyle = this.bgcolour;
+}
+
+class CircleRenderer {
+	/**
+	 * 
+	 * @param {Button|Menu} parent 
+	 * @param {Number} radius 
+	 * @param {String} bgcolour 
+	 * @param {String} hoverbg
+	 * @param {String} text 
+	 * @param {String} txtcolour 
+	 * @param {String} font 
+	 */
+	constructor(parent, radius, bgcolour, hoverbg, text, txtcolour, font) {
+		this.parent = parent;
+		this.radius = radius;
+		this.bgcolour = bgcolour;
+		this.hoverbg = hoverbg;
+		this.text = text;
+		this.txtcolour = txtcolour;
+		this.font = font;
+	}
+
+	/**
+	 * 
+	 * @param {CanvasRenderingContext2D} ctx 
+	 */
+	render(ctx) {
+		let position = this.parent.globalPosition;
+		ctx.fillStyle = this.bgcolour;
+		ctx.beginPath();
+		ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
+		ctx.fill();
+		if (this.parent.hover) {
+			ctx.fillStyle= this.hoverbg;
 			ctx.beginPath();
 			ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
 			ctx.fill();
-			if (this.parent.hover) {
-				ctx.fillStyle= this.hoverbg;
-				ctx.beginPath();
-				ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
-				ctx.fill();
-			}
-			ctx.fillStyle = this.txtcolour;
-			ctx.font = this.font;
-			let textDetails = ctx.measureText(this.text);
-			ctx.fillText(this.text, position.x-textDetails.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2);
 		}
+		ctx.fillStyle = this.txtcolour;
+		ctx.font = this.font;
+		let textDetails = ctx.measureText(this.text);
+		ctx.fillText(this.text, position.x-textDetails.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2);
 	}
-
-	UI_COLLIDERS.RectangleCollider = RectangleCollider;
-	UI_COLLIDERS.CircleCollider = CircleCollider;
-	UI_RENDERERS.RectangleRenderer = RectangleRenderer;
-	UI_RENDERERS.CircleRenderer = CircleRenderer;
-	Object.freeze(UI_RENDERERS);
-})();
+}
 
 /**
- * @typedef {UI_COLLIDERS.RectangleCollider|UI_COLLIDERS.CircleCollider} Collider
+ * @typedef {RectangleCollider|CircleCollider} Collider
  */
 
 class Button {
@@ -268,7 +257,7 @@ class Menu {
 		 */
 		this.menus = [];
 		this.size = size instanceof Vector ? size.copy() : new Vector(0, 0);
-		this.collider = new UI_COLLIDERS.RectangleCollider(this, this.size.x, this.size.y);
+		this.collider = new RectangleCollider(this, this.size.x, this.size.y);
 		this.hover = false;
 	}
 
@@ -369,13 +358,13 @@ class Menu {
  * @param {String} txtcolour 
  * @param {String} font 
  * @param {Function[]} callbacks 
- * @returns {Button} a button with a `UI_COLLIDERS.RectangleCollider` and `UI_RENDERERS.RectangleRenderer`
+ * @returns {Button} a button with a `RectangleCollider` and `RectangleRenderer`
  */
 const RectangleButton = (parent, x, y, width, height, bgcolour, hoverbg, text, txtcolour, font, callbacks) => {
 	return new Button(
 		parent, new Vector(x, y),
-		new UI_COLLIDERS.RectangleCollider(null, width, height),
-		new UI_RENDERERS.RectangleRenderer(null, width, height, bgcolour, hoverbg, text, txtcolour, font),
+		new RectangleCollider(null, width, height),
+		new RectangleRenderer(null, width, height, bgcolour, hoverbg, text, txtcolour, font),
 		callbacks
 	);
 }
@@ -392,13 +381,13 @@ const RectangleButton = (parent, x, y, width, height, bgcolour, hoverbg, text, t
  * @param {String} txtcolour 
  * @param {String} font 
  * @param {Function[]} callbacks 
- * @returns {Button} a button with a `UI_COLLIDERS.CircleCollider` and a `UI_RENDERERS.CircleRenderer`
+ * @returns {Button} a button with a `CircleCollider` and a `CircleRenderer`
  */
 const CircleButton = (parent, x, y, radius, bgcolour, hoverbg, text, txtcolour, font, callbacks) => {
 	return new Button(
 		parent, new Vector(x, y),
-		new UI_COLLIDERS.CircleCollider(null, radius),
-		new UI_RENDERERS.CircleRenderer(null, radius, bgcolour, hoverbg, text, txtcolour, font),
+		new CircleCollider(null, radius),
+		new CircleRenderer(null, radius, bgcolour, hoverbg, text, txtcolour, font),
 		callbacks
 	);
 }

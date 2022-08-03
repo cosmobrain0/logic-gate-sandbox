@@ -1,1 +1,19 @@
-- make a todo
+implement Bit
+
+[done]
+
+implement BasicNandGate
+implement CustomGate
+create a CustomGate out of a BasicNandGate
+create a Board
+create a Board with CustomGates
+create a CustomGate out of a Board out of CustomGates
+
+render a Bit
+render CustomGates
+render Boards
+
+refactor rendering to use UI (maybe create some useful classes irdk)
+use UI to allow mouse control of elements
+
+add UI for creating/saving boards

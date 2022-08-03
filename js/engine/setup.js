@@ -75,10 +75,10 @@ const Time = {
 /**
  * @type {Matter.Engine}
  */
-let physicsEngine; // physics engine
+// let physicsEngine; // physics engine
 
 window.onload = () => {
-	physicsEngine = Matter.Engine.create();
+	// physicsEngine = Matter.Engine.create();
 	Time.paused = false;
 	Time.previousFrameTime = Date.now();
     requestAnimationFrame(main);
@@ -94,12 +94,12 @@ const main = (t) => {
 		if (previousX == 0) previousX = 10;
 		let currentX = 0;
 		let totalTimeDone = 0;
-		while (totalTimeDone < totalTimeRequired) {
-			currentX = min(totalTimeRequired-totalTimeDone, 10);
-			Matter.Engine.update(physicsEngine, currentX, currentX/previousX);
-			totalTimeDone += currentX;
-			previousX = currentX;
-		}
+		// while (totalTimeDone < totalTimeRequired) {
+		// 	currentX = min(totalTimeRequired-totalTimeDone, 10);
+		// 	Matter.Engine.update(physicsEngine, currentX, currentX/previousX);
+		// 	totalTimeDone += currentX;
+		// 	previousX = currentX;
+		// }
 		if (!Scene.currentTransition && Scene.currentScene) Scene.currentScene.calc(Scene.currentScene);
 		if (Scene.currentTransition) {
 			Scene.transitionFrom.calc(Scene.transitionFrom);

@@ -29,8 +29,25 @@ const findHoveredButton = (position, menu) => {
 		}
 	}
 	for (let m of menu.menus) {
-		let button = findHoveredButton(m);
+		let button = findHoveredButton(position, m);
 		if (button) return button;
+	}
+	return null;
+}
+
+/**
+ * 
+ * @param {Vector} position 
+ * @param {Menu} menu 
+ */
+const findHoveredMenu = (position, menu) => {
+	if (menu.isHovering(position)) {
+		return menu;
+	}
+	for (let m of menu.menus) {
+		if (m.isHovering(position)) {
+			return m;
+		}
 	}
 	return null;
 }
@@ -63,8 +80,8 @@ onmousedown = e => {
 onmouseup = e => {
     if (e.button == 0) {
 		Input.mouse.leftclick.down = false;
-		UI.update(Input.mouse.leftclick.start, Input.mouse.leftclick.down);
-		if (Scene.currentScene) Scene.currentScene.UI.update(Input.mouse.leftclick.start, Input.mouse.leftclick.down);
+		UI.update(Input.mouse.leftclick.start, Input.mouse.leftclick.path[Input.mouse.leftclick.path.length-1], true);
+		if (Scene.currentScene) Scene.currentScene.UI.update(Input.mouse.leftclick.start, Input.mouse.leftclick.path[Input.mouse.leftclick.path.length-1], true);
 	}
     else if (e.button == 2) Input.mouse.rightclick.down = false;
 	for (let f of Events.mouseup) f(e);

@@ -326,14 +326,20 @@ class Menu {
 		menu.parent = this;
 	}
 
-	update(mouse, mousedown) {
+	/**
+	 * 
+	 * @param {Vector} mouse position of cursor at the start of mousedown / current position
+	 * @param {Vector} mouseEnd position of cursor at the end of mousedown / current position
+	 * @param {boolean} mousedown wether or not the mouse is down
+	 */
+	update(mouse, mouseEnd, mousedown) {
 		this.hover = this.isHovering(mouse);
 		for (let button of this.buttons) {
-			button.hover = button.isHovering(mouse);
-			if (button.hover && mousedown) button.click();
+			button.hover = button.isHovering(mouseEnd);
+			if (button.hover && button.isHovering(mouse) && mousedown) button.click();
 		}
 		for (let input of this.textInputs) input.update();
-		for (let menu of this.menus) menu.update(mouse, mousedown);
+		for (let menu of this.menus) menu.update(mouse, mouseEnd, mousedown);
 	}
 
 	/**

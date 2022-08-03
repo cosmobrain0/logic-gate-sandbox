@@ -348,11 +348,11 @@ class Menu {
 	 */
 	draw(ctx) {
 		// this.renderer.render();
-		for (let menu of this.menus) {
-			menu.draw(ctx);
+		for (let i=this.menus.length-1; i>=0; i--) {
+			this.menus[i].draw(ctx);
 		}
-		for (let button of this.buttons) {
-			button.draw(ctx);
+		for (let i=this.buttons.length-1; i>=0; i--) {
+			this.buttons[i].draw(ctx);
 		}
 	}
 }

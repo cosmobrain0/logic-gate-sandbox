@@ -16,6 +16,7 @@ class Bit {
                 () => this.value = !this.value,
             ]
         );
+        this.canReceiveInput = true;
     }
 
     draw(ctx) {
@@ -27,18 +28,53 @@ class Bit {
     }
 
     /**
+     * moves the bit
+     * @param {Vector} offset how much to move
+     */
+    offset(offset) {
+        this.position.add(offset);
+        this.label.position.add(offset);
+    }
+
+    /**
+     * sets the position
+     * @param {Vector} position the new position
+     */
+    setPosition(position) {
+        this.offset(this.position.to(position));
+    }
+
+    /**
      * 
      * @param {Vector} position 
      * @param {Scene} scene 
      * @returns {Bit}
      */
     static create(position, scene) {
-        return new Bit(position, scene, false);
+        let bit = new Bit(position, scene, false);
+        scene.data.bits.push(bit);
+        return bit;
+    }
+
+    /**
+     * 
+     * @param {Bit} bit 
+     * @param {Scene} scene 
+     */
+    static destroy(bit, scene) {
+        scene.data.bitLabels.removeButton(bit.label);
+        scene.data.bits.splice(scene.data.bits.indexOf(bit), 1);
+        for (let i=scene.data.connections.length-1; i>=0; i--) {
+            if (scene.data.connections[i].a == bit || scene.data.connections[i].b == bit) {
+                scene.data.connections[i].dead = true;
+            }
+        }
     }
 }
 
 class NandGate {
-    static radius = 80;
+    static width = 140;
+    static height = 80;
     static name = "NAND";
     /**
      * 
@@ -54,20 +90,29 @@ class NandGate {
         this.b = b ? b : null;
         this.q = q ? q : null;
         this.name = NandGate.name;
-        this.label = CircleButton(
-            scene.data.gateLabels, position.x, position.y, NandGate.radius, "#0000", "#0000", NandGate.name, "#000", "30px Arial", []
+        this.label = RectangleButton(
+            scene.data.gateLabels, position.x-NandGate.width/2, position.y-NandGate.height/2, NandGate.width, NandGate.height, "#ccc", "#0000", NandGate.name, "#000", "30px Arial", []
         );
+        if (this.q) this.q.canReceiveInput = false;
     }
 
     update() {
+        this.a.setPosition(new Vector(-NandGate.width/2, -NandGate.height*0.4).add(this.position));
+        this.b.setPosition(new Vector(-NandGate.width/2, NandGate.height*0.4).add(this.position));
+        this.q.setPosition(new Vector(NandGate.width/2, 0).add(this.position));
         this.q.value = !((this.a!=null && this.a.value) && (this.b!=null && this.b.value));
     }
 
-    draw(ctx) {
-        ctx.beginPath();
-        ctx.fillStyle = "#ccc";
-        ctx.arc(this.position.x, this.position.y, NandGate.radius, 0, TWO_PI);
-        ctx.fill();
+    /**
+     * moves the gate
+     * @param {Vector} offset how much to move
+     */
+    offset(offset) {
+        this.a.offset(offset);
+        this.b.offset(offset);
+        this.q.offset(offset);
+        this.label.position.add(offset);
+        this.position.add(offset);
     }
 
     /**
@@ -77,13 +122,26 @@ class NandGate {
      * @returns {NandGate}
      */
     static create(position, scene) {
-        let a = Bit.create(Vector.fromPolar( PI*3/4, NandGate.radius).add(position), scene);
-        let b = Bit.create(Vector.fromPolar(-PI*3/4, NandGate.radius).add(position), scene);
-        let c = Bit.create(new Vector(position.x+NandGate.radius, position.y), scene);
+        let a = Bit.create(new Vector(-NandGate.width/2, -NandGate.height*0.4).add(position), scene);
+        let b = Bit.create(new Vector(-NandGate.width/2, NandGate.height*0.4).add(position), scene);
+        let c = Bit.create(new Vector(NandGate.width/2, 0).add(position), scene);
         let gate = new NandGate(position, scene, a, b, c);
-        scene.data.bits.push(a, b, c);
+        // scene.data.bits.push(a, b, c);
         scene.data.gates.push(gate);
         return gate;
+    }
+
+    /**
+     * 
+     * @param {NandGate} gate 
+     * @param {Scene} scene 
+     */
+    static destroy(gate, scene) {
+        Bit.destroy(gate.a, scene);
+        Bit.destroy(gate.b, scene);
+        Bit.destroy(gate.q, scene);
+        scene.data.gateLabels.removeButton(gate.label);
+        scene.data.gates.splice(scene.data.gates.indexOf(gate), 1);
     }
 }
 
@@ -116,5 +174,24 @@ class Connection {
         ctx.moveTo(this.a.position.x, this.a.position.y);
         ctx.lineTo(this.b.position.x, this.b.position.y);
         ctx.stroke();
+    }
+
+    /**
+     * 
+     * @param {Vector} point 
+     */
+    sqrDistanceTo(point) {
+        let p1 = this.a.position;
+        let p2 = this.b.position;
+
+        let m1 = (p1.y-p2.y) / (p1.x-p2.x);
+        let c1 = p1.y - m1*p1.x;
+        let m2 = -1/m1;
+        let c2 = point.y - m2*point.x;
+
+        let x = Utility.clampUnordered((c2-c1)/(m1-m2), p1.x, p2.x);
+        let y = m1*x + c1;
+
+        return point.sqrDistanceTo(new Vector(x, y));
     }
 }

@@ -64,32 +64,44 @@ scenes.push(
             for (let connection of connections) {
                 connection.draw(ctx);
             }
-            for (let gate of gates) {
-                gate.draw(ctx);
-            }
+            // for (let gate of gates) {
+            //     gate.draw(ctx);
+            // }
             for (let bit of bits) {
                 bit.draw(ctx);
             }
 
             UI.draw(ctx);
 
-            ctx.fillStyle = "#fff";
-            let { position: mouse } = Input.mouse;
-            if (gateSelected == null) {
-                ctx.fillRect(mouse.x-10, mouse.y-10, 20, 20);
-            } else {
-                ctx.font = "40px Arial";
-                ctx.fillText(GATES[gateSelected].name, mouse.x, mouse.y+40);
-            }
-
-            if (Input.mouse.leftclick.down) {
+            if (Input.keymap.Shift) {
+                // deleting
                 ctx.beginPath();
-                ctx.strokeStyle = "#000";
-                ctx.lineWidh = 5;
-                let path = Input.mouse.leftclick.path;
-                ctx.moveTo(Input.mouse.leftclick.start.x, Input.mouse.leftclick.start.y);
-                ctx.lineTo(path[path.length-1].x, path[path.length-1].y);
+                ctx.strokeStyle = "#f00";
+                ctx.lineWidth = 5;
+                let position = Input.mouse.position.copy();
+                ctx.moveTo(position.x-30, position.y-30);
+                ctx.lineTo(position.x+30, position.y+30);
+                ctx.moveTo(position.x+30, position.y-30);
+                ctx.lineTo(position.x-30, position.y+30);
                 ctx.stroke();
+            } else {
+                ctx.fillStyle = "#fff";
+                let { position: mouse } = Input.mouse;
+                if (gateSelected == null) {
+                    ctx.fillRect(mouse.x-10, mouse.y-10, 20, 20);
+                } else {
+                    ctx.font = "40px Arial";
+                    ctx.fillText(GATES[gateSelected].name, mouse.x, mouse.y+40);
+                }
+                if (Input.mouse.leftclick.down) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = "#000";
+                    ctx.lineWidh = 5;
+                    let path = Input.mouse.leftclick.path;
+                    ctx.moveTo(Input.mouse.leftclick.start.x, Input.mouse.leftclick.start.y);
+                    ctx.lineTo(path[path.length-1].x, path[path.length-1].y);
+                    ctx.stroke();
+                }
             }
         },
     }),
@@ -123,34 +135,114 @@ scenes.push(
 
 Scene.load(scenes[0]);
 
+/**
+ * 
+ * @param {Scene?} scene 
+ * @returns {Bit[]}
+ */
 const bits = scene => (scene ? scene : Scene.currentScene).data.bits;
+/**
+ * 
+ * @param {Scene?} scene 
+ * @returns {Scene[]}
+ */
 const gates = scene => (scene ? scene : Scene.currentScene).data.gates;
+/**
+ * 
+ * @param {Scene?} scene 
+ * @returns {Connection[]}
+ */
 const connections = scene => (scene ? scene : Scene.currentScene).data.connections;
+/**
+ * 
+ * @param {Scnee?} scene 
+ * @returns 
+ */
 const data = scene => (scene ? scene : Scene.currentScene).data;
+
+/**
+ * 
+ * @param {Circlebutton} label 
+ * @param {Scene} scene 
+ * @returns {Bit}
+ */
+const bitFromLabel = (label, scene) => data(scene).bits.filter(x => x.label == label)[0];
+/**
+ * 
+ * @param {RectangleButton} label 
+ * @param {Scene} scene 
+ * @returns {NandGate}
+ */
+const gatefromLabel = (label, scene) => data(scene).gates.filter(x => x.label == label)[0];
 
 Events.mouseup.push(e => {
     if (Scene.currentScene != scenes[0]) return; // this event is for scene[0]
     let button = Input.mouse.leftclick;
-    if (button.selected) {
-        let startHover = findHoveredButton(button.start, Scene.currentScene.UI);
-        let endHover = findHoveredButton(button.path[button.path.length-1], Scene.currentScene.UI);
-        console.log(startHover);
-        console.log(endHover);
-        if (startHover == endHover) return; // rely on button events to handle clicking UI elements
-        if (data().bitLabels.buttons.includes(startHover) && data().bitLabels.buttons.includes(endHover)) {
-            // line between two bits: make a connection
-            data().connections.push(new Connection(data().bits.filter(x => x.label == startHover)[0], data().bits.filter(x => x.label == endHover)[0], Scene.currentScene))
+    let start = button.start;
+    let end = button.path[button.path.length-1];
+
+    if (findHoveredMenu(start, data().gatesMenu) || findHoveredMenu(end, data().gatesMenu)) return; // ignore menu stuffs
+
+    let wasDragged = Input.mouse.leftclick.drag().length() > 10;
+    
+    if (wasDragged) {
+        let startSelectedItem = findHoveredButton(start, Scene.currentScene.UI);
+        let endSelectedItem = findHoveredButton(end, Scene.currentScene.UI);
+
+        let startSelectedBit = data().bitLabels.buttons.includes(startSelectedItem) ? startSelectedItem : null;
+        let startSelectedGate = data().gateLabels.buttons.includes(startSelectedItem) ? startSelectedItem : null;
+
+        let endSelectedBit = data().bitLabels.buttons.includes(endSelectedItem) ? endSelectedItem : null;
+        let endSelectedGate = data().gateLabels.buttons.includes(endSelectedItem) ? endSelectedItem : null;
+
+        if (startSelectedBit && endSelectedBit && bitFromLabel(endSelectedBit).canReceiveInput) {
+            data().connections.push(new Connection(bitFromLabel(startSelectedBit), bitFromLabel(endSelectedBit), Scene.currentScene));
+            return; // created connection between two bits
+        }
+
+        if (startSelectedBit) {
+            bitFromLabel(startSelectedBit).offset(Vector.subtract(end, start));
             return;
         }
-    }
-    if (!findHoveredMenu(button.start, data().gatesMenu) && !findHoveredMenu(button.path[button.path.length-1], data().gatesMenu)) {
-        // this event is only triggered for mouse events on the game board (not on the menu to the right)
-        let position = button.path[button.path.length-1];
-        if (data().gateSelected != null) {
-            console.log(data().GATES[data().gateSelected]);
-            data().gates.push(data().GATES[data().gateSelected].create(position, Scene.currentScene));
-        } else {
-            data().bits.push(Bit.create(position, Scene.currentScene));
+        if (startSelectedGate) {
+            gatefromLabel(startSelectedGate).offset(Vector.subtract(end, start));
+            return;
         }
+        return; // dealt with all drag events
+    }
+
+    // not dragged
+    let selectedItem = findHoveredButton(start, Scene.currentScene.UI);
+
+    let selectedBit = data().bitLabels.buttons.includes(selectedItem) ? selectedItem : null;
+    let selectedGate = data().gateLabels.buttons.includes(selectedItem) ? selectedItem : null;
+
+    if (Input.keymap.Shift) {
+        if (selectedBit) {
+            let bit = bitFromLabel(selectedBit, Scene.currentScene);
+            Bit.destroy(bit, Scene.currentScene);
+            return; // deleted a bit
+        }
+        if (selectedGate) {
+            let gate = gatefromLabel(selectedGate, Scene.currentScene);
+            switch (gate.name) {
+                case NandGate.name:
+                    NandGate.destroy(gate, Scene.currentScene);
+                    break;
+            }
+            return; // deleted a gate
+        }
+        let selectedConnection = data().connections.filter(x => x.sqrDistanceTo(start) < 30)[0];
+        if (selectedConnection) data().connections.splice(data().connections.indexOf(selectedConnection), 1);
+        return; // deletions complete
+    }
+
+    // not deleting
+    if (selectedBit || selectedGate) return; // a bit or gate was clicked on. We don't care
+
+    if (data().gateSelected != null) {
+        data().GATES[data().gateSelected].create(start, Scene.currentScene);
+    } else {
+        data().bits.push(Bit.create(start, Scene.currentScene));
     }
 })

@@ -21,10 +21,6 @@ class Bit {
 
     draw(ctx) {
         this.label.renderer.bgcolour = this.value ? Bit.colourTrue : Bit.colourFalse;
-        // ctx.beginPath();
-        // ctx.fillStyle = this.value ? Bit.colourTrue : Bit.colourFalse;
-        // ctx.arc(this.position.x, this.position.y, 20, 0, TWO_PI);
-        // ctx.fill();
     }
 
     /**
@@ -145,6 +141,19 @@ class NandGate {
     }
 }
 
+class CustomGateType {
+    constructor() {
+        this.inputBits = [];
+        this.outputBits = [];
+    }
+}
+
+class CustomGateInstance {
+    constructor() {
+
+    }
+}
+
 class Connection {
     /**
      * a one-directional connection
@@ -195,3 +204,17 @@ class Connection {
         return point.sqrDistanceTo(new Vector(x, y));
     }
 }
+
+const GATES = [
+    NandGate
+];
+// update with various customgatetypes
+
+/**
+ * @typedef {Object} CustomGateType
+ * @property {Bit[]} inputBits
+ * @property {Bit[]} outputBits
+ * @property {Bit[]} bits
+ * @property {(NandGate|CustomGateInstance)[]} gates
+ * @property {Connection[]} connections
+ */

@@ -10,10 +10,6 @@ scenes.push(
             UI.addMenu(menu);
             data.gatesMenu = menu;
             data.gateSelected = 0;
-            data.GATES = [
-                NandGate
-            ];
-            Object.freeze(data.GATES);
             let buttons = [
                 ["BIT", [
                     () => data.gateSelected = null
@@ -48,7 +44,7 @@ scenes.push(
          * @param {Scene} param0 
          * @param {CanvasRenderingContext2D} ctx 
          */
-        draw: ({data: { gatesMenu, gateSelected, GATES, connections, gates, bits, }, UI}, ctx) => {
+        draw: ({data: { gatesMenu, gateSelected, connections, gates, bits, }, UI}, ctx) => {
             ctx.fillStyle = "#666";
             ctx.fillRect(0, 0, Canvas.width, Canvas.height);
 
@@ -90,8 +86,11 @@ scenes.push(
                 if (gateSelected == null) {
                     ctx.fillRect(mouse.x-10, mouse.y-10, 20, 20);
                 } else {
-                    ctx.font = "40px Arial";
-                    ctx.fillText(GATES[gateSelected].name, mouse.x, mouse.y+40);
+                    ctx.font = "30px Arial";
+                    let offset = ctx.measureText(GATES[gateSelected].name);
+                    let width = offset.width;
+                    let height = (offset.actualBoundingBoxAscent+offset.actualBoundingBoxDescent);
+                    ctx.fillText(GATES[gateSelected].name, mouse.x-width/2, mouse.y+20 - height/2);
                 }
                 if (Input.mouse.leftclick.down) {
                     ctx.beginPath();
@@ -105,32 +104,6 @@ scenes.push(
             }
         },
     }),
-    new Scene({
-        init: ({data}) => {
-            data.gates = [];
-            data.connections = [];
-            data.bits = [];
-        },
-        calc: ({data: {gates, connections, bits}}) => {
-            for (let connection of connections) {
-                connection.update();
-            }
-            for (let gate of gates) {
-                gate.update();
-            }
-        },
-        draw: ({data: {gates, connections, bits}}, ctx) => {
-            for (let connection of connections) {
-                connection.draw(ctx);
-            }
-            for (let gate of gates) {
-                gate.draw(ctx);
-            }
-            for (let bit of bits) {
-                bit.draw(ctx);
-            }
-        }
-    }, {}, 'global')
 )
 
 Scene.load(scenes[0]);
@@ -241,7 +214,7 @@ Events.mouseup.push(e => {
     if (selectedBit || selectedGate) return; // a bit or gate was clicked on. We don't care
 
     if (data().gateSelected != null) {
-        data().GATES[data().gateSelected].create(start, Scene.currentScene);
+        GATES[data().gateSelected].create(start, Scene.currentScene);
     } else {
         data().bits.push(Bit.create(start, Scene.currentScene));
     }

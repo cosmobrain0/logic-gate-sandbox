@@ -4,6 +4,7 @@ implement Connection
 
 [done]
 
+implement Board - [now]
 implement CustomGate
 create a CustomGate out of a BasicNandGate
 create a Board

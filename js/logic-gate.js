@@ -23,6 +23,9 @@ class BasicNandGate {
         this.a = new Bit(position.copy(), 'A');
         this.b = new Bit(position.copy(), 'B');
         this.out = new Bit(position.copy(), 'OUT');
+        this.a.canGiveOutput = false;
+        this.b.canGiveOutput = false;
+        this.out.canGetInput = false;
     }
 
     update() {

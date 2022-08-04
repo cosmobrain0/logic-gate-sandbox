@@ -12,12 +12,12 @@ let board = new Board({
             new Bit(new Vector(2460, 720), 'test output')
         );
         scene.gates.push(
-            new BasicNandGate(new Vector(1280, 720))
+            CustomGate.fromBoard(GATES[0], new Vector(2560/2, 1440/2))
         );
         scene.connections.push(
-            new Connection(scene.inputs[0], scene.gates[0].a),
-            new Connection(scene.inputs[1], scene.gates[0].b),
-            new Connection(scene.gates[0].out, scene.outputs[0])
+            new Connection(scene.inputs[0], scene.gates[0].inputs[0]),
+            new Connection(scene.inputs[1], scene.gates[0].inputs[1]),
+            new Connection(scene.gates[0].outputs[0], scene.outputs[0])
         );
     },
     /**
@@ -42,17 +42,17 @@ let board = new Board({
         for (let output of scene.outputs) {
             drawBit(output, ctx);
         }
-        for (let gate of scene.gates) {
-            drawGate(gate, ctx);
-        }
         for (let connection of scene.connections) {
             drawConnection(connection, ctx);
+        }
+        for (let gate of scene.gates) {
+            drawCustomGate(gate, ctx);
         }
     },
     end: scene => {
 
     }
-}, []);
+}, [], 'global-board');
 Scene.load(board);
 
 /**
@@ -69,12 +69,26 @@ const drawBit = (bit, ctx) => {
 
 /**
  * 
- * @param {CustomGate} gate 
+ * @param {BasicNandGate} gate 
  * @param {CanvasRenderingContext2D} ctx 
  */
-const drawGate = (gate, ctx) => {
+const drawNandGate = (gate, ctx) => {
     ctx.fillStyle = "#fff";
     ctx.fillRect(gate.position.x-50, gate.position.y-50, 100, 100);
+}
+
+/**
+ * @param {CustomGate} gate
+ * @param {CanvasRenderingContext2D} ctx
+ */
+const drawCustomGate = (gate, ctx) => {
+    let size = gate.size(ctx);
+    ctx.fillStyle = "#ccc";
+    ctx.fillRect(gate.position.x-size.x/2, gate.position.y-size.y/2, size.x, size.y);
+    ctx.fillStyle = "#000";
+    ctx.fillText(gate.name, gate.position.x-size.x/2 + 20, gate.position.y+30/2);
+    for (let bit of gate.inputs) drawBit(bit, ctx);
+    for (let bit of gate.outputs) drawBit(bit, ctx);
 }
 
 /**

@@ -11,6 +11,14 @@ class Bit {
         this.canGetInput = true;
         this.canGiveOutput = true;
     }
+
+    copy() {
+        let bit = new Bit(this.position.copy(), this.name);
+        bit.value = this.value;
+        bit.canGetInput = this.canGetInput;
+        bit.canGiveOutput = this.canGiveOutput;
+        return bit;
+    }
 }
 
 class BasicNandGate {
@@ -26,15 +34,20 @@ class BasicNandGate {
         this.a.canGiveOutput = false;
         this.b.canGiveOutput = false;
         this.out.canGetInput = false;
+        this.inputs = [this.a, this.b];
+        this.outputs = [this.out];
+        this.bits = [];
+        this.gates = [];
+        this.connections = [];
     }
 
     update() {
         this.out.value = !(this.a.value && this.b.value);
     }
-}
 
-class CustomGate extends Board {
-
+    copy() {
+        return new BasicNandGate(this.position.copy());
+    }
 }
 
 class Connection {

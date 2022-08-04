@@ -1,19 +1,21 @@
 implement Bit
 implement BasicNandGate
 implement Connection
-
-[done]
-
-implement Board - [now]
+implement Board
 implement CustomGate
+
 create a CustomGate out of a BasicNandGate
 create a Board
 create a Board with CustomGates
-create a CustomGate out of a Board out of CustomGates
-
+create a CustomGate out of a Board out of CustomGates (AND gate, using console)
 render a Bit
+
 render CustomGates
 render Boards
+
+[done]
+
+render labels
 
 refactor rendering to use UI (maybe create some useful classes irdk)
 use UI to allow mouse control of elements

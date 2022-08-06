@@ -325,7 +325,9 @@ class Menu {
 		this.hover = this.isHovering(mouse);
 		for (let button of this.buttons) {
 			button.hover = button.isHovering(mouseEnd);
-			if (button.hover && button.isHovering(mouse) && mousedown) button.click();
+			if (button.hover && button.isHovering(mouse) && mousedown) {
+				button.click();
+			}
 		}
 		for (let input of this.textInputs) input.update();
 		for (let menu of this.menus) menu.update(mouse, mouseEnd, mousedown);

@@ -17,7 +17,7 @@ render Boards
 
 render labels
 
-refactor rendering to use UI (maybe create some useful classes irdk)
-use UI to allow mouse control of elements
-
-add UI for creating/saving boards
+add UI for setting input/output labels
+make sure when creating custom gates, the order of inputs/outputs matches the y-coordinates of the board input/outputs
+add UI for selecting / creating custom gates
+add UI for saving / loading custom gates

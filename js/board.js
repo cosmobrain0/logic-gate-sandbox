@@ -25,10 +25,18 @@ class Board extends Scene {
          */
         this.gates = [];
         /**
-         * @type {CustomGate[]}
+         * @type {Connection[]}
          */
         this.connections = [];
         this.name = name;
+        // this.UI.addButton(RectangleButton(this.UI, 100, 100, 200, 50, "#fff", "#0004", "hello", "#000", "30px Arial", [
+        //     button => console.log("hey"),
+        // ]));
+        this.inputMenu = new Menu(new Vector(0, 0), this.UI, new Vector(Canvas.width, Canvas.height));
+        this.outputMenu = new Menu(new Vector(0, 0), this.UI, new Vector(Canvas.width, Canvas.height));
+        this.bitMenu = new Menu(new Vector(0, 0), this.UI, new Vector(Canvas.width, Canvas.height));
+        this.gateMenu = new Menu(new Vector(0, 0), this.UI, new Vector(Canvas.width, Canvas.height));
+        this.selectedGateType = 'NAND';
     }
 
     update() {
@@ -123,6 +131,7 @@ class CustomGate extends Board {
      * @param {CanvasRenderingContext2D} ctx 
      */
     size(ctx) {
+        if (!ctx) ctx = Canvas.ctx;
         ctx.font = "30px Arial";
         let textDetails = ctx.measureText(this.name);
         return new Vector(
@@ -181,6 +190,7 @@ class CustomGate extends Board {
             }
             gate.connections.push(new Connection(input, output));
         }
+        gate.UI = new Menu(new Vector(0, 0), null, new Vector(Canvas.width, Canvas.height));
         return gate;
     }
 
@@ -195,6 +205,26 @@ class CustomGate extends Board {
  */
 const GATES = [];
 
+/**
+ * 
+ * @param {Board} board 
+ * @param {String} name 
+ */
+const createCustomGateType = (board, name) => {
+    let gate = CustomGate.fromBoard(board, new Vector(0, 0));
+    gate.name = name;
+    GATES.push(gate);
+}
+
+/**
+ * 
+ * @param {String} name 
+ * @returns 
+ */
+const gateTypeByName = name => {
+    return GATES.filter(x => x.name == name)[0];
+}
+
 // set up NAND CustomGate
 {
     let NandGate = new Board({}, [], 'NAND');
@@ -207,5 +237,6 @@ const GATES = [];
         new Connection(NandGate.inputs[1], NandGate.gates[0].b),
         new Connection(NandGate.gates[0].out, NandGate.outputs[0])
     );
-    GATES.push(CustomGate.fromBoard(NandGate, new Vector(0, 0)));
+    // GATES.push(CustomGate.fromBoard(NandGate, new Vector(0, 0)));
+    createCustomGateType(NandGate, 'NAND');
 }
